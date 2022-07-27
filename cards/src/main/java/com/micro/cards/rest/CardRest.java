@@ -36,7 +36,7 @@ public class CardRest {
 
     }
 
-        @GetMapping("/accounts/properties")
+    @GetMapping("/cards/properties")
     public String getAccountServicePropertiesDetails() throws Exception{
         ObjectWriter writer = new ObjectMapper().writer().withDefaultPrettyPrinter();
         Properties properties = new Properties(cardsServiceConfig.getMsg(), cardsServiceConfig.getBuildVersion(),
