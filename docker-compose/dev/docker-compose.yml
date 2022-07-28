@@ -25,7 +25,7 @@ services:
         max_attempts: 3
         window: 120s
     environment:
-      SPRING_PROFILES_ACTIVE: default
+      SPRING_PROFILES_ACTIVE: dev
       SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
 
   accounts:
