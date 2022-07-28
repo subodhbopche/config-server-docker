@@ -2,14 +2,34 @@ version: "3.8"
 
 services:
   configserver:
-    image: subodhbopche/configserver
+    image: subodhbopche/configserver:latest
     mem_limit: 700m
     ports:
       - "8071:8071"
     networks:
       - subhbytes
+
+  discoveryserver:
+    image: subodhbopche/discoveryserver:latest
+    mem_limit: 700m
+    ports:
+      - "8070:8070"
+    networks:
+      - eazybank
+    depends_on:
+      - configserver
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+        max_attempts: 3
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+
   accounts:
-    image: subodhbopche/accounts
+    image: subodhbopche/accounts:latest
     mem_limit: 700m
     ports:
       - "8080:8080"
@@ -17,6 +37,7 @@ services:
       - subhbytes
     depends_on:
       - configserver
+      - discoveryserver
     deploy:
       restart_policy:
         condition: on-failure
@@ -26,8 +47,10 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8070/eureka/
+
   loans:
-    image: subodhbopche/loans
+    image: subodhbopche/loans:latest
     mem_limit: 700m
     ports:
       - "8090:8090"
@@ -35,6 +58,7 @@ services:
       - subhbytes
     depends_on:
       - configserver
+      - discoveryserver
     deploy:
       restart_policy:
         condition: on-failure
@@ -44,8 +68,10 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8070/eureka/
+
   cards:
-    image: subodhbopche/cards
+    image: subodhbopche/cards:latest
     mem_limit: 700m
     ports:
       - "9000:9000"
@@ -53,6 +79,7 @@ services:
       - subhbytes
     depends_on:
       - configserver
+      - discoveryserver
     deploy:
       restart_policy:
         condition: on-failure
@@ -62,6 +89,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8070/eureka/
 
 networks:
   subhbytes:
