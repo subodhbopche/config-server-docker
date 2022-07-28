@@ -26,6 +26,7 @@ public class LoansRest {
 
     @PostMapping("/myLoans")
     public List<Loans> getLoansDetails(@RequestBody Customer customer) {
+        System.out.println("this sop used to check retry count for Loans Service !!!!");
         List<Loans> loans = loansRepository.findByCustomerIdOrderByStartDtDesc(customer.getCustomerID());
         if (loans != null) {
             return loans;
