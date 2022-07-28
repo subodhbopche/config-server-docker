@@ -21,8 +21,8 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 15s
-        max_attempts: 3
+        delay: 45s
+        max_attempts: 4
         window: 120s
     environment:
       SPRING_PROFILES_ACTIVE: default
@@ -41,7 +41,7 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 5s
+        delay: 60s
         max_attempts: 3
         window: 120s
     environment:
@@ -62,7 +62,7 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 5s
+        delay: 60s
         max_attempts: 3
         window: 120s
     environment:
@@ -83,7 +83,7 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 5s
+        delay: 60s
         max_attempts: 3
         window: 120s
     environment:
