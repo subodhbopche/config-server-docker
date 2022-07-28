@@ -15,7 +15,7 @@ services:
     ports:
       - "8070:8070"
     networks:
-      - eazybank
+      - subhbytes
     depends_on:
       - configserver
     deploy:
