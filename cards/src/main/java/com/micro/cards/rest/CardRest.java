@@ -9,11 +9,9 @@ import com.micro.cards.dto.Properties;
 import com.micro.cards.entity.Cards;
 import com.micro.cards.repository.CardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.HeaderParam;
 import java.util.List;
 
 @RestController
@@ -26,7 +24,8 @@ public class CardRest {
     private CardsServiceConfig cardsServiceConfig;
 
     @PostMapping("/myCards")
-    public List<Cards> getCardDetails(@RequestBody Customer customer) {
+    public List<Cards> getCardDetails(@RequestHeader("micro_correlation_id") String correlationID, @RequestBody Customer customer) {
+        System.out.println("Correlation id found for cards service :: "+ correlationID);
         List<Cards> cards = cardRepository.findByCustomerId(customer.getCustomerID());
         if (cards != null) {
             return cards;

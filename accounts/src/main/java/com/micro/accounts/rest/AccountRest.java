@@ -12,11 +12,9 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.HeaderParam;
 import java.util.List;
 
 @RestController
@@ -58,10 +56,11 @@ public class AccountRest {
     /*@CircuitBreaker(name = "detailsForCustomerDetailsSupportApp", fallbackMethod = "myAccountDetailsHandler")
     @CircuitBreaker(name = "detailsForCustomerDetailsSupportApp")*/
     @Retry(name = "retryForCustomerDetails", fallbackMethod = "myAccountDetailsRetryHandler")
-    public CustomerDetails myCustomerDetails(@RequestBody Customer customer){
+    public CustomerDetails myCustomerDetails(@RequestHeader("micro_correlation_id") String correlationID, @RequestBody Customer customer){
+        System.out.println("Correlation id found for accounts service ::  "+ correlationID);
         Account account = accountRepository.findByCustomerId(customer.getCustomerID());
-        List<Loans> loans = loansFeignClient.getLoanDetails(customer);
-        List<Cards> cards = cardsFeignClient.getCardDetails(customer);
+        List<Loans> loans = loansFeignClient.getLoanDetails(correlationID,customer);
+        List<Cards> cards = cardsFeignClient.getCardDetails(correlationID, customer);
         System.out.println("Accounts ");
         CustomerDetails customerDetails = new CustomerDetails();
         customerDetails.setAccount(account);
@@ -71,9 +70,10 @@ public class AccountRest {
         return customerDetails;
     }
 
-    private CustomerDetails myAccountDetailsHandler(Customer customer, Throwable throwable){
+    private CustomerDetails myAccountDetailsHandler(@RequestHeader("micro_correlation_id") String correlationID, Customer customer, Throwable throwable){
+        System.out.println("Correlation id found for myAccountDetailsHandler "+ correlationID);
         Account account = accountRepository.findByCustomerId(customer.getCustomerID());
-        List<Loans> loans = loansFeignClient.getLoanDetails(customer);
+        List<Loans> loans = loansFeignClient.getLoanDetails(correlationID, customer);
         System.out.println("Accounts handler "+ throwable.getMessage());
         CustomerDetails customerDetails = new CustomerDetails();
         customerDetails.setAccount(account);
@@ -82,9 +82,10 @@ public class AccountRest {
         return customerDetails;
 
 
-    }private CustomerDetails myAccountDetailsRetryHandler(Customer customer, Throwable throwable){
+    }private CustomerDetails myAccountDetailsRetryHandler(@RequestHeader("micro_correlation_id")  String correlationID,Customer customer, Throwable throwable){
+        System.out.println("Correlation id found for myAccountDetailsRetryHandler "+ correlationID);
         Account account = accountRepository.findByCustomerId(customer.getCustomerID());
-        List<Loans> loans = loansFeignClient.getLoanDetails(customer);
+        List<Loans> loans = loansFeignClient.getLoanDetails(correlationID, customer);
         System.out.println("myAccountDetailsRetryHandler Accounts handler "+ throwable.getMessage());
         CustomerDetails customerDetails = new CustomerDetails();
         customerDetails.setAccount(account);
